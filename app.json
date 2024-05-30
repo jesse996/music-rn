@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "HelloWorld",
-    "slug": "expo-template-default",
+    "name": "rn-learn",
+    "slug": "rn-learn",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,13 +13,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.szxfml.rnlearn"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.szxfml.rnlearn"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +33,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "526f707b-3337-46dc-8052-3e4120fd78ba"
+      }
+    },
+    "owner": "szxfml",
+    "updates": {
+      "url": "https://u.expo.dev/526f707b-3337-46dc-8052-3e4120fd78ba"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }
