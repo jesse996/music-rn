@@ -1,84 +1,149 @@
-import { Image, StyleSheet, Platform, StatusBar, View, Text, Button } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { A } from '@expo/html-elements';
-import ImageViewer from '@/components/ImageViewer';
 // import Button from '@/components/Button';
-import * as ImagePicker from 'expo-image-picker';
-import React, { useEffect, useState } from 'react';
-import * as Linking from 'expo-linking';
+import { useCollList, useFilter } from '@/hooks/api/qq';
+import React, { useState } from 'react';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Button, H5, Separator, SizableText, Tabs, TabsContentProps, XStack, YStack, ZStack, ScrollView, Spinner, Image } from 'tamagui';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { show_playlist } from '@/adapter/qq';
 const PlaceholderImage = require('@/assets/images/background-image.png');
-import * as WebBrowser from 'expo-web-browser';
-import { Stack } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-export default function HomeScreen() {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const pickImageAsync = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      quality: 1,
-    });
 
-    if (!result.canceled) {
-      console.log(result);
-      setSelectedImage(result.assets[0].uri);
-    } else {
-      alert('You did not select any image.');
-    }
-  };
+export default function HomeScreen() {
+  const [filterId, setFilterId] = useState('');
+  // const { data, isLoading } = useCollList({ offset: 0, filterId })
+  const { data: { recommend, all } } = useFilter()
+
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["collList", filterId],
+    queryFn: ({ pageParam }) =>
+      show_playlist(pageParam, filterId),
+    initialPageParam: 0,
+    getNextPageParam: (_lastPage, pages) => pages.flat().length,
+  });
+
+  // if (isLoading) return <Text>loading</Text>
 
   return (
     <SafeAreaView>
-      {/* <View style={styles.imageContainer}>
-        <ImageViewer
-          placeholderImageSource={PlaceholderImage}
-          selectedImage={selectedImage}
-        />
-      </View>
-      <A href="https://google.com" style={{ color: 'white', marginBottom: 10 }}>Go to Google</A>
+      {/* 分类1 */}
+      <Tabs
+        defaultValue="recommend"
+        orientation="horizontal"
+        flexDirection="column"
+        // width='100%'
+        borderRadius="$4"
+        borderWidth="$0.25"
+        borderColor="$borderColor"
+      >
+        <Tabs.List
+          disablePassBorderRadius="bottom"
+        >
+          {/* <ScrollView horizontal > */}
 
-      <View style={styles.footerContainer}>
-        <Button theme="primary" label="Choose a photo" onPress={pickImageAsync} />
-        <Button label="Use this photo" />
-      </View>
-      <StatusBar style="auto" /> */}
+          <Tabs.Tab value={'recommend'} px='$3.5'>
+            <SizableText >推荐</SizableText>
+          </Tabs.Tab>
+          {all.map((filter, index) => (
+            <Tabs.Tab value={filter.category} key={index} flex={1} px='$1' >
+              <SizableText >{filter.category}</SizableText>
+            </Tabs.Tab>
+          ))}
 
-      <StatusBar style="auto" />
+          {/* </ScrollView> */}
+        </Tabs.List>
+        <Separator />
 
-      <Button
-        title="111Open URL with the system browser"
-        onPress={() => Linking.openURL('https://expo.dev')}
-        style={styles.button}
+        <TabsContent value="recommend" >
+          <ScrollView horizontal gap='$2'>
+            {recommend.map((item, index) => (
+              <Button key={index} onPress={() => setFilterId(item.id)} mr={'$1.5'}>
+                {item.name}
+              </Button>
+            ))}
+          </ScrollView>
+        </TabsContent>
+
+        {all.map(({ category, filters }, index) => (
+          <TabsContent key={index} value={category} >
+            <ScrollView horizontal >
+
+              {filters.map((item, index) => (
+                <Button key={index} onPress={() => setFilterId(item.id)} mr={'$1.5'}>
+                  {item.name}
+                </Button>
+              ))}
+            </ScrollView>
+          </TabsContent>
+
+        ))}
+
+      </Tabs>
+      {isLoading ? <Spinner /> : null}
+
+      <FlatList
+        data={data?.pages.flat()}
+        numColumns={2}
+        style={{ marginBottom: 50 }}
+        onEndReached={() => fetchNextPage()}
+
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <XStack
+            padding="$2"
+            flex={1}
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="center"
+            borderBottomWidth="$0.25"
+            borderColor="$borderColor"
+          >
+            <YStack >
+              <Image source={{ uri: item.cover_img_url }} style={{ width: '100%', height: 100 }} />
+              <SizableText fontFamily="$body">{item.title}</SizableText>
+            </YStack>
+          </XStack>
+        )}
+        ListEmptyComponent={
+          <View >
+            {(!isLoading) && <Text style={{ textAlign: 'center', marginTop: 10 }}>暂无数据</Text>}
+          </View>
+        }
+        ListFooterComponent={
+          <View style={{ height: 100, }}>
+            {isFetchingNextPage && <Spinner />}
+          </View>
+        }
       />
-      <Button
-        title="Open URL with an in-app browser"
-        onPress={() => WebBrowser.openBrowserAsync('https://expo.dev')}
-        style={styles.button}
-      />
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#25292e',
-    alignItems: 'center',
-  },
-  imageContainer: {
-    flex: 1,
-    paddingTop: 58,
-  },
-  image: {
-    width: 320,
-    height: 440,
-    borderRadius: 18,
-  },
-  footerContainer: {
-    flex: 1 / 3,
-    alignItems: 'center',
-  },
-});
+const TabsContent = (props: TabsContentProps) => {
+  return (
+    <Tabs.Content
+      backgroundColor="$background"
+      key="tab3"
+      padding="$2"
+      alignItems="center"
+      justifyContent="center"
+      borderColor="$background"
+      borderRadius="$2"
+      borderTopLeftRadius={0}
+      borderTopRightRadius={0}
+      borderWidth="$2"
+      {...props}
+    >
+      {props.children}
+    </Tabs.Content>
+  )
+}

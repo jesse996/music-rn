@@ -2,7 +2,7 @@
   "expo": {
     "name": "rn-learn",
     "slug": "rn-learn",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -37,6 +37,7 @@
             "newArchEnabled": true
           },
           "android": {
+            "usesCleartextTraffic": true,
             "newArchEnabled": true
           }
         }
