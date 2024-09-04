@@ -46,6 +46,7 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="playlist/[id]" options={{ title: '歌单' }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </QueryClientProvider>
