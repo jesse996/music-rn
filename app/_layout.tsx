@@ -1,15 +1,17 @@
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { config } from '@tamagui/config/v3';
+import { TamaguiProvider, createTamagui } from '@tamagui/core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import 'expo-dev-client';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { TamaguiProvider, createTamagui } from '@tamagui/core'
-import { config } from '@tamagui/config/v3'
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import "../global.css"
+import "../global.css";
+import AudioPlayer from '@/components/AudioPlayer';
+import Toastable from 'react-native-toastable';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const tamaguiConfig = createTamagui(config)
 // TypeScript types across all Tamagui APIs
@@ -29,7 +31,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-
+  const { top } = useSafeAreaInsets();
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -49,6 +51,16 @@ export default function RootLayout() {
           <Stack.Screen name="playlist/[id]" options={{ title: '歌单' }} />
           <Stack.Screen name="+not-found" />
         </Stack>
+        <AudioPlayer />
+        <Toastable
+          statusMap={{
+            success: 'red',
+            danger: 'yellow',
+            warning: 'green',
+            info: 'blue',
+          }}
+          offset={top}
+        />
       </QueryClientProvider>
     </TamaguiProvider>
 

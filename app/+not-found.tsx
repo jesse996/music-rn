@@ -1,20 +1,21 @@
 import { Link, Stack, usePathname } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { SizableText } from 'tamagui';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+
 
 export default function NotFoundScreen() {
   const pathname = usePathname()
   return (
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.  {JSON.stringify(pathname)}</ThemedText>
+      <View style={styles.container}>
+        <SizableText >This screen doesn't exist.  {JSON.stringify(pathname)}</SizableText>
         <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
+          <SizableText >Go to home screen!</SizableText>
         </Link>
-      </ThemedView>
+      </View>
     </>
   );
 }
