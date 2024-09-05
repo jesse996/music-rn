@@ -101,7 +101,7 @@ export default function AudioPlayer() {
 
   return (
     <View position='absolute' left={0} right={0} bottom={pathname === '/' ? '$8' : '0'}>
-      <XStack backgroundColor={'white'} justifyContent='space-around' alignItems='center' px='$3'>
+      <XStack backgroundColor={'white'} justifyContent='space-between' alignItems='center' px="$4" py="$2" >
         <Image source={{ uri: currentSong?.img_url, width: 50, height: 50 }}></Image>
         <Text>{currentSong?.title}</Text>
         <Ionicons name={currStatus?.isLoaded && currStatus.isPlaying ? 'pause' : 'play'} size={24} color="black" onPress={async () => {
